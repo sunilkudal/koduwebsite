@@ -9,24 +9,46 @@ const images = [
 
 const Carousel = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [slidesToShow, setSlidesToShow] = useState(1);
+
+  useEffect(() => {
+    const updateSlidesToShow = () => {
+      if (window.innerWidth >= 1024) {
+        setSlidesToShow(3); // Desktop - Show 3 images
+      } else {
+        setSlidesToShow(1); // Mobile - Show 1 image
+      }
+    };
+
+    updateSlidesToShow(); // Run once on mount
+    window.addEventListener("resize", updateSlidesToShow);
+    return () => window.removeEventListener("resize", updateSlidesToShow);
+  }, []);
 
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
-    }, 2000);
+    }, 3000);
     return () => clearInterval(interval);
   }, []);
 
   return (
-    <div className="relative w-full max-w-3xl overflow-hidden">
-      <div className="flex transition-transform duration-500" style={{ transform: `translateX(-${currentIndex * 33.33}%)` }}>
-        {images.concat(images).map((image, index) => (
-          <img
+    <div className="relative w-full max-w-3xl overflow-hidden mx-auto">
+      <div
+        className="flex transition-transform duration-700 ease-in-out"
+        style={{ transform: `translateX(-${currentIndex * (100 / slidesToShow)}%)` }}
+      >
+        {images.map((image, index) => (
+          <div
             key={index}
-            src={image}
-            alt="Carousel Slide"
-            className="w-1/3 h-[300px] object-cover rounded-2xl"
-          />
+            className="w-full lg:w-1/3 flex-shrink-0 px-2"
+          >
+            <img
+              src={image}
+              alt="Carousel Slide"
+              className="w-full h-[300px] object-cover rounded-2xl shadow-md"
+            />
+          </div>
         ))}
       </div>
     </div>
